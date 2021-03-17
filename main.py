@@ -6,12 +6,10 @@ class Vertex:
         self.id = node
         self.adjacent = {}
 
-        # Mark all nodes unvisited        
         self.visited = False  
-        # Predecessor
+
         self.previous = None
         self.contorno = []
-
 
     def add_neighbor(self, neighbor, weight=0):
         self.adjacent[neighbor] = weight
@@ -56,14 +54,14 @@ class Graph:
         else:
             return None
 
-    def add_edge(self, frm, to, cost = 0):
+    def add_edge(self, frm, to):
         if frm not in self.vert_dict:
             self.add_vertex(frm)
         if to not in self.vert_dict:
             self.add_vertex(to)
 
-        self.vert_dict[frm].add_neighbor(self.vert_dict[to], cost)
-        self.vert_dict[to].add_neighbor(self.vert_dict[frm], cost)
+        self.vert_dict[frm].add_neighbor(self.vert_dict[to])
+        self.vert_dict[to].add_neighbor(self.vert_dict[frm])
 
     def get_vertices(self):
         return self.vert_dict.keys()
@@ -79,20 +77,20 @@ def showImg(img):
     cv.waitKey(500)
     cv.destroyAllWindows()
 
-def adicionarEdges(g):
-    g.add_edge('RS', 'SC', 1)
+def adicionarConexoes(g):
+    g.add_edge('RS', 'SC')
     
-    g.add_edge('SC', 'RS', 1)
-    g.add_edge('SC', 'PR', 1)
+    g.add_edge('SC', 'RS')
+    g.add_edge('SC', 'PR')
     
-    g.add_edge('PR', 'SC', 1)
-    g.add_edge('PR', 'SP', 1)
-    g.add_edge('PR', 'MS', 1)
+    g.add_edge('PR', 'SC')
+    g.add_edge('PR', 'SP')
+    g.add_edge('PR', 'MS')
 
-    g.add_edge('SP', 'MS', 1)
-    g.add_edge('SP', 'PR', 1)
-    g.add_edge('SP', 'MG', 1)
-    g.add_edge('SP', 'RJ', 1)
+    g.add_edge('SP', 'MS')
+    g.add_edge('SP', 'PR')
+    g.add_edge('SP', 'MG')
+    g.add_edge('SP', 'RJ')
 
     return g
 
@@ -108,34 +106,38 @@ def popularGrafo(nome, pasta, estados, g):
     for i in range(2,len(contours)): 
         if(cv.contourArea(contours[i]) > 1.0):
             print('Contorno {}. Estado: {}'.format(i, estados[cont]))
-
-            #cv.fillPoly(copy, pts = [contours[i]], color=(random.randint(1, 255), random.randint(1, 255), random.randint(1, 255)))
-            #cv.imwrite(pasta+'{}'.format(cont)+nome, copy)
-
             g.add_vertex(estados[cont], contours[i])
 
             cont += 1
 
     return g
 
-def shortest(v, path):
-    if v.previous:
-        path.append(v.previous.get_id())
-        shortest(v.previous, path)
-    return
+def pintarNode(imagem, pasta, g, edge, color):
+    img = cv.imread(imagem)
+    copy = img.copy()
+    
+    v = g.get_vertex(edge)
+    print(v)
+
+    cv.fillPoly(copy, pts = [v.get_contorno()], color=(color[0], color[1], color[2]))
+    cv.imwrite(pasta+imagem, copy)
 
 def main():
-    f = Graph()
+    g = Graph()
    
     estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
-    pasta = 'mapa.jpg'
-    imagem = 'imagens/'
+    imagem = 'mapa.jpg'
+    pasta = 'imagens/'
     
-    f = popularGrafo(pasta, imagem, estados, f)
-    f = adicionarEdges(f)
+    g = popularGrafo(imagem, pasta, estados, g)
+    g = adicionarConexoes(g)
 
+    pintarNode(imagem, pasta, g, 'PR', [random.randint(1, 255),random.randint(1, 255), random.randint(1, 255)])
+
+    '''
     for v in f:
         for w in v.get_connections():
             print('(%s , %s)'  % (v.get_id(), w.get_id()))
-            
+    '''
+
 main()
