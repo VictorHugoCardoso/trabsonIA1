@@ -8,7 +8,6 @@ class Vertex:
 
         self.visited = False  
 
-        self.previous = None
         self.contorno = []
 
     def add_neighbor(self, neighbor, weight=0):
@@ -22,12 +21,6 @@ class Vertex:
 
     def get_contorno(self):
         return self.contorno
-
-    def set_previous(self, prev):
-        self.previous = prev
-
-    def set_visited(self):
-        self.visited = True
 
     def __str__(self):
         return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent])
@@ -66,12 +59,6 @@ class Graph:
     def get_vertices(self):
         return self.vert_dict.keys()
 
-    def set_previous(self, current):
-        self.previous = current
-
-    def get_previous(self, current):
-        return self.previous
-
 def showImg(img):
     cv.imshow('image', img)
     cv.waitKey(500)
@@ -91,6 +78,114 @@ def adicionarConexoes(g):
     g.add_edge('SP', 'PR')
     g.add_edge('SP', 'MG')
     g.add_edge('SP', 'RJ')
+
+    '''
+    g.add_edge('MS', 'PR')
+    g.add_edge('MS', 'SP')
+    g.add_edge('MS', 'GO')
+    g.add_edge('MS', 'MT')
+
+    g.add_edge('MG', 'MT')
+    g.add_edge('MG', 'GO')
+    g.add_edge('MG', 'BA')
+    g.add_edge('MG', 'ES')
+    g.add_edge('MG', 'RJ')
+    
+    g.add_edge('ES', 'MG')
+    g.add_edge('ES', 'RJ')
+    g.add_edge('ES', 'BA')
+    
+    g.add_edge('RJ', 'SP')
+    g.add_edge('RJ', 'MG')
+    g.add_edge('RJ', 'ES')
+    
+    g.add_edge('GO', 'MS')
+    g.add_edge('GO', 'MT')
+    g.add_edge('GO', 'TO')
+    g.add_edge('GO', 'BA')
+    g.add_edge('GO', 'MG')
+    g.add_edge('GO', 'DF')
+    
+    g.add_edge('BA', 'MG')
+    g.add_edge('BA', 'ES')
+    g.add_edge('BA', 'GO')
+    g.add_edge('BA', 'TO')
+    g.add_edge('BA', 'PI')
+    g.add_edge('BA', 'PE')
+    g.add_edge('BA', 'AL')
+    g.add_edge('BA', 'SE')
+    
+    g.add_edge('SE', 'BA')
+    g.add_edge('SE', 'AL')
+    
+    g.add_edge('AL', 'SE')
+    g.add_edge('AL', 'BA')
+    g.add_edge('AL', 'PE')
+    
+    g.add_edge('PE', 'AL')
+    g.add_edge('PE', 'BA')
+    g.add_edge('PE', 'PI')
+    g.add_edge('PE', 'CE')
+    g.add_edge('PE', 'PB')
+    
+    g.add_edge('PB', 'RN')
+    g.add_edge('PB', 'PE')
+    g.add_edge('PB', 'CE')
+    
+    g.add_edge('RN', 'CE')
+    g.add_edge('RN', 'PB')
+    
+    g.add_edge('CE', 'RN')
+    g.add_edge('CE', 'PB')
+    g.add_edge('CE', 'PE')
+    g.add_edge('CE', 'PI')
+    
+    g.add_edge('PI', 'CE')
+    g.add_edge('PI', 'MA')
+    g.add_edge('PI', 'BA')
+    g.add_edge('PI', 'PE')
+    
+    g.add_edge('MA', 'PI')
+    g.add_edge('MA', 'TO')
+    g.add_edge('MA', 'PA')
+    
+    g.add_edge('TO', 'GO')
+    g.add_edge('TO', 'BA')
+    g.add_edge('TO', 'MA')
+    g.add_edge('TO', 'PA')
+    g.add_edge('TO', 'MT')
+    
+    g.add_edge('MT', 'MS')
+    g.add_edge('MT', 'GO')
+    g.add_edge('MT', 'TO')
+    g.add_edge('MT', 'PA')
+    g.add_edge('MT', 'AM')
+    g.add_edge('MT', 'RO')
+    
+    g.add_edge('PA', 'MT')
+    g.add_edge('PA', 'TO')
+    g.add_edge('PA', 'MA')
+    g.add_edge('PA', 'AP')
+    g.add_edge('PA', 'RR')
+    g.add_edge('PA', 'AM')
+    
+    g.add_edge('AP', 'PA')
+    
+    g.add_edge('RR', 'PA')
+    g.add_edge('RR', 'AM')
+    
+    g.add_edge('RO', 'MT')
+    g.add_edge('RO', 'AM')
+    
+    g.add_edge('AC', 'AM')
+    
+    g.add_edge('AM', 'AC')
+    g.add_edge('AM', 'RO')
+    g.add_edge('AM', 'RR')
+    g.add_edge('AM', 'PA')
+    
+    g.add_edge('DF', 'GO')
+    '''
 
     return g
 
@@ -112,19 +207,56 @@ def popularGrafo(nome, pasta, estados, g):
 
     return g
 
-def pintarNode(imagem, pasta, g, edge, color):
-    img = cv.imread(imagem+'.jpg')
-    copy = img.copy()
-    
-    v = g.get_vertex(edge)
-
-    cv.fillPoly(copy, pts = [v.get_contorno()], color=(color[0], color[1], color[2]))
-    cv.imwrite(pasta+imagem+v.get_id()+'.jpg', copy)
 
 def printGrafo(g):
     for v in g:
         for w in v.get_connections():
             print('(%s , %s)'  % (v.get_id(), w.get_id()))
+
+
+def bfs(imagem, pasta, graph, n):
+    # 0 - red, 1 - green, 2 - blue, 3 - cian, 4 - pink,
+    cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 204], [255, 0, 255]]
+    
+    img = cv.imread(imagem+'.jpg')
+    copy = img.copy()
+
+    node = graph.get_vertex(n)
+    
+    # cria uma lista de visitados, e atributo todos FALSO
+    visited = [False] * (graph.num_vertices + 1)
+    queue = []
+    
+    # visita o primeiro, e o enfilera
+    node.visited = True
+    
+    queue.append(node)
+
+    iteration = 0
+
+    while queue:
+        # Dequeue a vertex from 
+        # queue and print it
+        
+        popped = queue.pop(0)
+        print (popped, end = "\n")
+
+        '''
+        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[iteration]))
+        cv.imwrite(pasta+'iteracao'+str(iteration)+'.jpg', copy)
+        
+        if iteration != 4: iteration += 1 
+        else: iteration = 0 
+        
+        '''
+        for x in popped.adjacent:
+            if x.visited == False:
+                queue.append(x)
+                x.visited = True
+
+            print('--------------')
+                
+    
 
 def main():
     g = Graph()
@@ -136,7 +268,6 @@ def main():
     g = popularGrafo(imagem, pasta, estados, g)
     g = adicionarConexoes(g)
 
-    pintarNode(imagem, pasta, g, 'PR', [random.randint(1, 255),random.randint(1, 255), random.randint(1, 255)])
-    print(printGrafo(g))
+    print(bfs(imagem, pasta, g,'PR'))
 
 main()
