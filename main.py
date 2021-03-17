@@ -80,7 +80,7 @@ def adicionarConexoes(g):
     g.add_edge('SP', 'MG')
     g.add_edge('SP', 'RJ')
 
-    '''
+    
     g.add_edge('MS', 'PR')
     g.add_edge('MS', 'SP')
     g.add_edge('MS', 'GO')
@@ -186,7 +186,6 @@ def adicionarConexoes(g):
     g.add_edge('AM', 'PA')
     
     g.add_edge('DF', 'GO')
-    '''
 
     return g
 
@@ -236,11 +235,7 @@ def bfs(imagem, pasta, graph, n):
     i = 0
 
     while queue:
-        # Dequeue a vertex from 
-        # queue and print it
-        
 
-        print(i)
         popped = queue.pop(0)
         print (popped, end = "\n")
 
@@ -265,6 +260,6 @@ def main():
     g = popularGrafo(imagem, pasta, estados, g)
     g = adicionarConexoes(g)
 
-    print(bfs(imagem, pasta, g,'PR'))
+    print(bfs(imagem, pasta, g,'PA'))
 
 main()
