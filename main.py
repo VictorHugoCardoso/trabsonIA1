@@ -96,7 +96,7 @@ def adicionarConexoes(g):
 
 def popularGrafo(nome, pasta, estados, g):
     
-    img = cv.imread(nome)
+    img = cv.imread(nome+'.jpg')
     copy = img.copy()
     imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     ret, thresh = cv.threshold(imgray, 200, 255, 0)
@@ -113,31 +113,30 @@ def popularGrafo(nome, pasta, estados, g):
     return g
 
 def pintarNode(imagem, pasta, g, edge, color):
-    img = cv.imread(imagem)
+    img = cv.imread(imagem+'.jpg')
     copy = img.copy()
     
     v = g.get_vertex(edge)
-    print(v)
 
     cv.fillPoly(copy, pts = [v.get_contorno()], color=(color[0], color[1], color[2]))
-    cv.imwrite(pasta+imagem, copy)
+    cv.imwrite(pasta+imagem+v.get_id()+'.jpg', copy)
+
+def printGrafo(g):
+    for v in g:
+        for w in v.get_connections():
+            print('(%s , %s)'  % (v.get_id(), w.get_id()))
 
 def main():
     g = Graph()
    
     estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
-    imagem = 'mapa.jpg'
+    imagem = 'mapa'
     pasta = 'imagens/'
     
     g = popularGrafo(imagem, pasta, estados, g)
     g = adicionarConexoes(g)
 
     pintarNode(imagem, pasta, g, 'PR', [random.randint(1, 255),random.randint(1, 255), random.randint(1, 255)])
-
-    '''
-    for v in f:
-        for w in v.get_connections():
-            print('(%s , %s)'  % (v.get_id(), w.get_id()))
-    '''
+    print(printGrafo(g))
 
 main()
