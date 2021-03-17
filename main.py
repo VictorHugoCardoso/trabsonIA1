@@ -60,8 +60,9 @@ class Graph:
         return self.vert_dict.keys()
 
 def showImg(img):
-    cv.imshow('image', img)
-    cv.waitKey(500)
+    img = cv.resize(img,(600,600))
+    cv.imshow("Brasil", img)
+    cv.waitKey(0)
     cv.destroyAllWindows()
 
 def adicionarConexoes(g):
@@ -215,8 +216,8 @@ def printGrafo(g):
 
 
 def bfs(imagem, pasta, graph, n):
-    # 0 - red, 1 - green, 2 - blue, 3 - cian, 4 - pink,
-    cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 204], [255, 0, 255]]
+    # 0 - azul, 1 - verde, 2 - vermelho, 3 - amarelo, 4 - rosa,
+    cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
     
     img = cv.imread(imagem+'.jpg')
     copy = img.copy()
@@ -232,32 +233,28 @@ def bfs(imagem, pasta, graph, n):
     
     queue.append(node)
 
-    iteration = 0
+    i = 0
 
     while queue:
         # Dequeue a vertex from 
         # queue and print it
         
+
+        print(i)
         popped = queue.pop(0)
         print (popped, end = "\n")
 
-        '''
-        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[iteration]))
-        cv.imwrite(pasta+'iteracao'+str(iteration)+'.jpg', copy)
-        
-        if iteration != 4: iteration += 1 
-        else: iteration = 0 
-        
-        '''
+        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[i%5]))
+        cv.imwrite(pasta+'iteracao'+str(i)+'.jpg', copy)    
+
+        showImg(copy)
+
         for x in popped.adjacent:
             if x.visited == False:
-                queue.append(x)
                 x.visited = True
+                queue.append(x)    
 
-            print('--------------')
-                
-    
-
+        i += 1
 def main():
     g = Graph()
    
