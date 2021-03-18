@@ -1,5 +1,15 @@
 import cv2 as cv
-import random
+import time
+
+# 0 - azul, 
+# 1 - verde, 
+# 2 - vermelho, 
+# 3 - amarelo, 
+# 4 - rosa,
+cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
+estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
+imagem = 'mapa'
+pasta = 'imagens/'
 
 class Vertex:
     def __init__(self, node):
@@ -59,13 +69,47 @@ class Graph:
     def get_vertices(self):
         return self.vert_dict.keys()
 
+    def DFSUtil(self, v, visited, img, i):
+        
+        # Mark the current node as visited
+        # and print it
+        visited.add(v)
+        print(v, end='\n')
+
+        i =+ 1
+
+        cv.fillPoly(img, pts = [v.get_contorno()], color=(cores[i%5]))
+        cv.imwrite('imagens/iteracao'+str(i)+'.jpg', img)   
+
+        # Recur for all the vertices
+        # adjacent to this vertex
+        for neighbour in v.adjacent:
+            if neighbour not in visited:
+                self.DFSUtil(neighbour, visited, img, i)
+    
+        # The function to do DFS traversal. It uses
+        # recursive DFSUtil()
+    def DFS(self, v):
+        
+        img = cv.imread('mapa.jpg')
+        copy = img.copy()   
+        
+        # Create a set to store visited vertices
+        visited = set()
+
+        node = self.get_vertex(v)
+        # Call the recursive helper function
+        # to print DFS traversal
+        self.DFSUtil(node, visited, copy, i=0)
+        
+
 def showImg(img):
     img = cv.resize(img,(600,600))
     cv.imshow("Brasil", img)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
-def adicionarConexoes(g):
+def addEdges(g):
     g.add_edge('RS', 'SC')
     
     g.add_edge('SC', 'RS')
@@ -186,10 +230,10 @@ def adicionarConexoes(g):
     g.add_edge('AM', 'PA')
     
     g.add_edge('DF', 'GO')
-
+    
     return g
 
-def popularGrafo(nome, pasta, estados, g):
+def addVertexs(nome, pasta, g):
     
     img = cv.imread(nome+'.jpg')
     copy = img.copy()
@@ -202,7 +246,6 @@ def popularGrafo(nome, pasta, estados, g):
         if(cv.contourArea(contours[i]) > 1.0):
             print('Contorno {}. Estado: {}'.format(i, estados[cont]))
             g.add_vertex(estados[cont], contours[i])
-
             cont += 1
 
     return g
@@ -214,52 +257,53 @@ def printGrafo(g):
             print('(%s , %s)'  % (v.get_id(), w.get_id()))
 
 
-def bfs(imagem, pasta, graph, n):
-    # 0 - azul, 1 - verde, 2 - vermelho, 3 - amarelo, 4 - rosa,
-    cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
+def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
     
     img = cv.imread(imagem+'.jpg')
     copy = img.copy()
-
-    node = graph.get_vertex(n)
     
-    # cria uma lista de visitados, e atributo todos FALSO
-    visited = [False] * (graph.num_vertices + 1)
     queue = []
     
     # visita o primeiro, e o enfilera
+    node = graph.get_vertex(n)
     node.visited = True
-    
     queue.append(node)
 
-    i = 0
+    i,j = 0,0
 
+    start = time.time()
     while queue:
 
         popped = queue.pop(0)
-        print (popped, end = "\n")
+        print ("[{}] - {}".format(j,popped))
 
         cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[i%5]))
-        cv.imwrite(pasta+'iteracao'+str(i)+'.jpg', copy)    
-
-        showImg(copy)
+        
+        if savesteps: cv.imwrite(pasta+'bfs-'+str(i)+'.jpg', copy)    
+        if(stepbystep): showImg(copy)
 
         for x in popped.adjacent:
+            j += 1
             if x.visited == False:
+                cv.fillPoly(copy, pts = [x.get_contorno()], color=(0, 0, 0))
+                
+                if(stepbystep): showImg(copy)
+
                 x.visited = True
                 queue.append(x)    
 
         i += 1
+
+    print("\n{} miliseconds".format(time.time() - start))
+        
 def main():
     g = Graph()
-   
-    estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
-    imagem = 'mapa'
-    pasta = 'imagens/'
     
-    g = popularGrafo(imagem, pasta, estados, g)
-    g = adicionarConexoes(g)
-
-    print(bfs(imagem, pasta, g,'PA'))
+    g = addVertexs(imagem, pasta, g)
+    g = addEdges(g)
+    
+    print("\n")
+    print(BFS(imagem, pasta, g,'SP', 0, 0))
+    #print(g.DFS('PR'))
 
 main()
