@@ -34,7 +34,6 @@ def addEdges(g):
     g.add_edge('SP', 'MG')
     g.add_edge('SP', 'RJ')
 
-    
     g.add_edge('MS', 'PR')
     g.add_edge('MS', 'SP')
     g.add_edge('MS', 'GO')
@@ -45,6 +44,7 @@ def addEdges(g):
     g.add_edge('MG', 'BA')
     g.add_edge('MG', 'ES')
     g.add_edge('MG', 'RJ')
+    g.add_edge('MG', 'DF')
     
     g.add_edge('ES', 'MG')
     g.add_edge('ES', 'RJ')
@@ -69,6 +69,7 @@ def addEdges(g):
     g.add_edge('BA', 'PE')
     g.add_edge('BA', 'AL')
     g.add_edge('BA', 'SE')
+    g.add_edge('BA', 'MA')
     
     g.add_edge('SE', 'BA')
     g.add_edge('SE', 'AL')
@@ -86,7 +87,7 @@ def addEdges(g):
     g.add_edge('PB', 'RN')
     g.add_edge('PB', 'PE')
     g.add_edge('PB', 'CE')
-    
+
     g.add_edge('RN', 'CE')
     g.add_edge('RN', 'PB')
     
@@ -103,6 +104,7 @@ def addEdges(g):
     g.add_edge('MA', 'PI')
     g.add_edge('MA', 'TO')
     g.add_edge('MA', 'PA')
+    g.add_edge('MA', 'BA')
     
     g.add_edge('TO', 'GO')
     g.add_edge('TO', 'BA')
@@ -131,8 +133,10 @@ def addEdges(g):
     
     g.add_edge('RO', 'MT')
     g.add_edge('RO', 'AM')
+    g.add_edge('RO', 'AC')
     
     g.add_edge('AC', 'AM')
+    g.add_edge('AC', 'RO')
     
     g.add_edge('AM', 'AC')
     g.add_edge('AM', 'RO')
@@ -140,6 +144,7 @@ def addEdges(g):
     g.add_edge('AM', 'PA')
     
     g.add_edge('DF', 'GO')
+    g.add_edge('DF', 'MS')
     
     return g
 
@@ -180,7 +185,23 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
     visited.add(node)
     print(node, end='\n')
 
-    cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[i % 5]))
+    match = 0
+    pos = 0
+    j = 0
+    for cor in cores:
+        for neighbour in node.adjacent:
+            if cor == neighbour.get_contorno():
+                match = 1
+
+        if match == 1:
+            match = 0
+        else:
+            pos = j;
+            break
+        j += 1
+
+    cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[j]))
+    node.contorno = cores[j]
     cv.imwrite(pasta + 'bfs-' + str(i) + '.jpg', copy)
     showImg(copy)
 
@@ -209,8 +230,23 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
         popped = queue.pop(0)
         print ("[{}] - {}".format(j,popped))
 
-        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[i%5]))
-        
+        match = 0
+        k = 0
+        pos = 0
+        for cor in cores:
+            for neighbour in popped.adjacent:
+                if cor == neighbour.get_contorno():
+                    match = 1
+
+            if match == 1:
+                match = 0
+            else:
+                pos = k
+                break
+            k += 1
+
+        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[k]))
+        popped.contorno = cores[k]
         if savesteps: cv.imwrite(pasta+'bfs-'+str(i)+'.jpg', copy)    
         if(stepbystep): showImg(copy)
 
@@ -235,7 +271,7 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    #print(BFS(imagem, pasta, g,'SP', 1, 1))
-    print(DFS(imagem, pasta, g,'SP'))
+    print(BFS(imagem, pasta, g,'SP', 1, 1))
+    #print(DFS(imagem, pasta, g,'SP'))
 
 main()
