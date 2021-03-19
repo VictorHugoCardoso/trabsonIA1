@@ -2,12 +2,12 @@ import cv2 as cv
 import time
 from Graph import Graph
 
-# 0 - azul, 
-# 1 - verde, 
-# 2 - vermelho, 
-# 3 - amarelo, 
-# 4 - rosa,
-cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
+# 0 - rosa, 
+# 1 - azul escuro, 
+# 2 - amarelo, 
+# 3 - azul claro, 
+# 4 - roxo,
+cores = [[99,3,223], [90,36,29], [3,179,249], [172, 99, 1], [103, 24, 169]]
 estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
 imagem = 'mapa'
 pasta = 'imagens/'
@@ -38,6 +38,7 @@ def addEdges(g):
     g.add_edge('MS', 'SP')
     g.add_edge('MS', 'GO')
     g.add_edge('MS', 'MT')
+    g.add_edge('MS', 'MG')
 
     g.add_edge('MG', 'MT')
     g.add_edge('MG', 'GO')
@@ -45,6 +46,7 @@ def addEdges(g):
     g.add_edge('MG', 'ES')
     g.add_edge('MG', 'RJ')
     g.add_edge('MG', 'DF')
+    g.add_edge('MG', 'MS')
     
     g.add_edge('ES', 'MG')
     g.add_edge('ES', 'RJ')
@@ -100,6 +102,7 @@ def addEdges(g):
     g.add_edge('PI', 'MA')
     g.add_edge('PI', 'BA')
     g.add_edge('PI', 'PE')
+    g.add_edge('PI', 'TO')
     
     g.add_edge('MA', 'PI')
     g.add_edge('MA', 'TO')
@@ -111,6 +114,7 @@ def addEdges(g):
     g.add_edge('TO', 'MA')
     g.add_edge('TO', 'PA')
     g.add_edge('TO', 'MT')
+    g.add_edge('TO', 'PI')
     
     g.add_edge('MT', 'MS')
     g.add_edge('MT', 'GO')
@@ -262,7 +266,7 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
 
         i += 1
 
-    print("\n{} miliseconds".format(time.time() - start))
+    print("\n{} miliseconds\n".format(time.time() - start))
         
 def main():
     g = Graph()
@@ -271,7 +275,7 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    print(BFS(imagem, pasta, g,'SP', 1, 1))
-    #print(DFS(imagem, pasta, g,'SP'))
+    print(BFS(imagem, pasta, g,'AP', 1, 1))
+    #print(DFS(imagem, pasta, g,'PI'))
 
 main()
