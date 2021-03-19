@@ -166,6 +166,28 @@ def printGrafo(g):
         for w in v.get_connections():
             print('(%s , %s)'  % (v.get_id(), w.get_id()))
 
+def DFS(imagem, pasta, graph, n):
+    node = graph.get_vertex(n)
+    i = 0;
+    visited = set()
+
+    img = cv.imread(imagem + '.jpg')
+    copy = img.copy()
+
+    DFSUtil(imagem, pasta, node, visited, i, copy)
+
+def DFSUtil(imagem, pasta, node, visited, i, copy):
+    visited.add(node)
+    print(node, end='\n')
+
+    cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[i % 5]))
+    cv.imwrite(pasta + 'bfs-' + str(i) + '.jpg', copy)
+    showImg(copy)
+
+    for neighbour in node.adjacent:
+        if neighbour not in visited:
+            i += 1
+            DFSUtil(imagem, pasta, neighbour, visited, i, copy)
 
 def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
     
@@ -213,7 +235,7 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    print(BFS(imagem, pasta, g,'SP', 1, 1))
-    #print(g.DFS('PR'))
+    #print(BFS(imagem, pasta, g,'SP', 1, 1))
+    print(DFS(imagem, pasta, g,'SP'))
 
 main()

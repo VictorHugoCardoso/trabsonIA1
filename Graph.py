@@ -37,38 +37,3 @@ class Graph:
 
     def get_vertices(self):
         return self.vert_dict.keys()
-
-    def DFSUtil(self, v, visited, img, i, cores):
-
-        # Mark the current node as visited
-        # and print it
-        visited.add(v)
-        print(v, end='\n')
-
-        i = + 1
-
-        cv.fillPoly(img, pts=[v.get_contorno()], color=(cores[i % 5]))
-        cv.imwrite('imagens/iteracao' + str(i) + '.jpg', img)
-
-        # Recur for all the vertices
-        # adjacent to this vertex
-        for neighbour in v.adjacent:
-            if neighbour not in visited:
-                self.DFSUtil(neighbour, visited, img, i)
-
-        # The function to do DFS traversal. It uses
-        # recursive DFSUtil()
-
-    def DFS(self, v):
-
-        img = cv.imread('mapa.jpg')
-        copy = img.copy()
-
-        # Create a set to store visited vertices
-        visited = set()
-
-        node = self.get_vertex(v)
-        # Call the recursive helper function
-        # to print DFS traversal
-        self.DFSUtil(node, visited, copy, i=0)
-
