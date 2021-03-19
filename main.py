@@ -279,13 +279,15 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
         popped = queue.pop(0)
         print ("[{}] - {}".format(iteracoes,popped))
 
+
         for x in popped.adjacent:
             iteracoes += 1
+            x.cor = popped.cor + 1
 
             if x.visited == False:
                 cv.fillPoly(copy, pts = [x.get_contorno()], color=(0, 0, 0))
-                
-                if stepbystep: showImg(copy)
+                    
+                #if stepbystep: showImg(copy)
 
                 x.visited = True
                 queue.append(x)
