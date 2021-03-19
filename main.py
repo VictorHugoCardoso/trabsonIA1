@@ -7,7 +7,7 @@ from Graph import Graph
 # 2 - vermelho, 
 # 3 - amarelo, 
 # 4 - rosa,
-cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
+cores = [[99,3,223], [90,36,29], [3,179,249], [172, 99, 1], [103, 24, 169]]
 estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
 imagem = 'mapa'
 pasta = 'imagens/'
