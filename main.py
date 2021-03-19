@@ -1,108 +1,17 @@
 import cv2 as cv
 import time
+from Graph import Graph
 
-# 0 - rosa, 
-# 1 - azul escuro, 
-# 2 - amarelo, 
-# 3 - azul claro, 
-# 4 - roxo,
-cores = [[99,3,223], [90,36,29], [3,179,249], [172, 99, 1], [103, 24, 169]]
+# 0 - azul, 
+# 1 - verde, 
+# 2 - vermelho, 
+# 3 - amarelo, 
+# 4 - rosa,
+cores = [[255,0,0], [0,255,0], [0,0,255], [0, 255, 255], [255, 0, 255]]
 estados = ['RS','SC','PR','RJ','SP','ES','MS','DF','MG','GO','SE','AL','BA','RO','AC','PE','MT','PB','RN','TO','CE','PI','MA','AM','PA','AP','RR']
 imagem = 'mapa'
 pasta = 'imagens/'
-#BGR
 
-
-class Vertex:
-    def __init__(self, node):
-        self.id = node
-        self.adjacent = {}
-        self.visited = False  
-        self.contorno = []
-        self.cor = 0
-
-    def add_neighbor(self, neighbor, weight=1):
-        self.adjacent[neighbor] = weight
-
-    def get_connections(self):
-        return self.adjacent.keys()  
-
-    def get_id(self):
-        return self.id
-
-    def get_contorno(self):
-        return self.contorno
-
-    def __str__(self):
-        return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent]) + ', cor: '+ str(self.cor)
-
-class Graph:
-    def __init__(self):
-        self.vert_dict = {}
-        self.num_vertices = 0
-
-    def __iter__(self):
-        return iter(self.vert_dict.values())
-
-    def add_vertex(self, node, contorno):
-        self.num_vertices = self.num_vertices + 1
-        new_vertex = Vertex(node)
-        self.vert_dict[node] = new_vertex
-        new_vertex.contorno = contorno
-        return new_vertex
-
-
-    def get_vertex(self, n):
-        if n in self.vert_dict:
-            return self.vert_dict[n]
-        else:
-            return None
-
-    def add_edge(self, frm, to):
-        if frm not in self.vert_dict:
-            self.add_vertex(frm)
-        if to not in self.vert_dict:
-            self.add_vertex(to)
-
-        self.vert_dict[frm].add_neighbor(self.vert_dict[to])
-        self.vert_dict[to].add_neighbor(self.vert_dict[frm])
-
-    def get_vertices(self):
-        return self.vert_dict.keys()
-    '''
-    def DFSUtil(self, v, visited, img, i):
-        
-        # Mark the current node as visited
-        # and print it
-        visited.add(v)
-        print(v, end='\n')
-
-        i =+ 1
-
-        cv.fillPoly(img, pts = [v.get_contorno()], color=(cores[i%5]))
-        cv.imwrite('imagens/iteracao'+str(i)+'.jpg', img)   
-
-        # Recur for all the vertices
-        # adjacent to this vertex
-        for neighbour in v.adjacent:
-            if neighbour not in visited:
-                self.DFSUtil(neighbour, visited, img, i)
-    
-        # The function to do DFS traversal. It uses
-        # recursive DFSUtil()
-    def DFS(self, v):
-        
-        img = cv.imread('mapa.jpg')
-        copy = img.copy()   
-        
-        # Create a set to store visited vertices
-        visited = set()
-
-        node = self.get_vertex(v)
-        # Call the recursive helper function
-        # to print DFS traversal
-        self.DFSUtil(node, visited, copy, i=0)
-    '''
 
 def showImg(img):
     img = cv.resize(img,(600,600))
@@ -266,41 +175,36 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
     queue = []
     
     # visita o primeiro, e o enfilera
-    startNode = graph.get_vertex(n)
-    startNode.visited = True
+    node = graph.get_vertex(n)
+    node.visited = True
+    queue.append(node)
 
-    queue.append(startNode)
-
-    estadosPintados,iteracoes = 0,0
+    i,j = 0,0
 
     start = time.time()
     while queue:
-        
-        popped = queue.pop(0)
-        print ("[{}] - {}".format(iteracoes,popped))
 
+        popped = queue.pop(0)
+        print ("[{}] - {}".format(j,popped))
+
+        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[i%5]))
+        
+        if savesteps: cv.imwrite(pasta+'bfs-'+str(i)+'.jpg', copy)    
+        if(stepbystep): showImg(copy)
 
         for x in popped.adjacent:
-            iteracoes += 1
-            x.cor = popped.cor + 1
-
+            j += 1
             if x.visited == False:
                 cv.fillPoly(copy, pts = [x.get_contorno()], color=(0, 0, 0))
-                    
-                #if stepbystep: showImg(copy)
+                
+                if(stepbystep): showImg(copy)
 
                 x.visited = True
-                queue.append(x)
-        
-        cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[popped.cor]))
-        
-        estadosPintados += 1
+                queue.append(x)    
 
-        if savesteps: cv.imwrite(pasta+'bfs-'+str(estadosPintados)+'.jpg', copy)    
-        if stepbystep: showImg(copy)
-        
+        i += 1
 
-    print("\n{} miliseconds\n".format(time.time() - start))
+    print("\n{} miliseconds".format(time.time() - start))
         
 def main():
     g = Graph()
@@ -309,7 +213,7 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    print(BFS(imagem, pasta, g,'SP', 0, 1))
+    print(BFS(imagem, pasta, g,'SP', 1, 1))
     #print(g.DFS('PR'))
 
 main()
