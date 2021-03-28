@@ -189,6 +189,9 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
     visited.add(node)
     print(node, end='\n')
 
+    qcores = [0,0,0,0,0]
+    start = time.time()
+
     match = 0
     pos = 0
     j = 0
@@ -206,7 +209,8 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
 
     cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[j]))
     node.contorno = cores[j]
-    cv.imwrite(pasta + 'bfs-' + str(i) + '.jpg', copy)
+    cv.imwrite(pasta + 'dfs-' + str(i) + '.jpg', copy)
+    qcores[j] = qcores[j]+1
     showImg(copy)
 
     for neighbour in node.adjacent:
@@ -227,6 +231,8 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
     queue.append(node)
 
     i,j = 0,0
+
+    qcores = [0,0,0,0,0]
 
     start = time.time()
     while queue:
@@ -251,6 +257,9 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
 
         cv.fillPoly(copy, pts = [popped.get_contorno()], color=(cores[k]))
         popped.contorno = cores[k]
+        
+        qcores[k] = qcores[k]+1
+        
         if savesteps: cv.imwrite(pasta+'bfs-'+str(i)+'.jpg', copy)    
         if(stepbystep): showImg(copy)
 
@@ -266,7 +275,9 @@ def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
 
         i += 1
 
-    print("\n{} miliseconds\n".format(time.time() - start))
+    print("\nExecutado em {} segundos".format(time.time() - start))
+    print("Cores usadas {}".format(qcores))
+    print("{} iterações\n".format(j))
         
 def main():
     g = Graph()
@@ -275,7 +286,7 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    print(BFS(imagem, pasta, g,'AP', 1, 1))
-    #print(DFS(imagem, pasta, g,'PI'))
+    #print(BFS(imagem, pasta, g,'PR', 1, 0))
+    print(DFS(imagem, pasta, g,'PR'))
 
 main()
