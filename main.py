@@ -183,14 +183,17 @@ def DFS(imagem, pasta, graph, n):
     img = cv.imread(imagem + '.jpg')
     copy = img.copy()
 
+    start = time.time()
+
     DFSUtil(imagem, pasta, node, visited, i, copy)
+    
+    print("\nExecutado em {} segundos".format(time.time() - start))
 
 def DFSUtil(imagem, pasta, node, visited, i, copy):
     visited.add(node)
     print(node, end='\n')
 
     qcores = [0,0,0,0,0]
-    start = time.time()
 
     match = 0
     pos = 0
@@ -209,14 +212,20 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
 
     cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[j]))
     node.contorno = cores[j]
+    
+    print(i)
     cv.imwrite(pasta + 'dfs-' + str(i) + '.jpg', copy)
     qcores[j] = qcores[j]+1
-    showImg(copy)
+    #showImg(copy)
 
     for neighbour in node.adjacent:
         if neighbour not in visited:
             i += 1
             DFSUtil(imagem, pasta, neighbour, visited, i, copy)
+    
+    #print("\nCores usadas {}".format(qcores))
+    #print("{} iterações\n".format(i))
+
 
 def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
     
