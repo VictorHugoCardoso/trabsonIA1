@@ -177,29 +177,33 @@ def printGrafo(g):
 
 def DFS(imagem, pasta, graph, n, showSteps):
     node = graph.get_vertex(n)
-    i = 0;
+    i = 0
     visited = set()
+    iteracoes = [0]
+    qcores = [0, 0, 0, 0, 0]
 
     img = cv.imread(imagem + '.jpg')
     copy = img.copy()
 
     start = time.time()
 
-    DFSUtil(imagem, pasta, node, visited, i, copy, showSteps)
+    DFSUtil(imagem, pasta, node, visited, i, copy, showSteps, qcores, iteracoes)
     
     print("\nExecutado em {} segundos".format(time.time() - start))
+    print("\nCores usadas {}".format(qcores))
+    print("{} iterações\n".format(iteracoes))
 
-def DFSUtil(imagem, pasta, node, visited, i, copy):
+def DFSUtil(imagem, pasta, node, visited, i, copy, showSteps, qcores, iteracoes):
     visited.add(node)
     print(node, end='\n')
-
-    qcores = [0,0,0,0,0]
+    iteracoes[0] = iteracoes[0] + 1
 
     match = 0
     pos = 0
     j = 0
     for cor in cores:
         for neighbour in node.adjacent:
+            iteracoes[0] = iteracoes[0] + 1
             if cor == neighbour.get_contorno():
                 match = 1
 
@@ -212,19 +216,15 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
 
     cv.fillPoly(copy, pts=[node.get_contorno()], color=(cores[j]))
     node.contorno = cores[j]
-    
-    print(i)
+
     cv.imwrite(pasta + 'dfs-' + str(i) + '.jpg', copy)
     qcores[j] = qcores[j]+1
-    if(stepbystep): showImg(copy)
+    if(showSteps): showImg(copy)
 
     for neighbour in node.adjacent:
         if neighbour not in visited:
             i += 1
-            DFSUtil(imagem, pasta, neighbour, visited, i, copy)
-    
-    #print("\nCores usadas {}".format(qcores))
-    #print("{} iterações\n".format(i))
+            DFSUtil(imagem, pasta, neighbour, visited, i, copy, showSteps, qcores, iteracoes)
 
 
 def BFS(imagem, pasta, graph, n, savesteps, stepbystep):
