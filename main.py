@@ -175,7 +175,7 @@ def printGrafo(g):
         for w in v.get_connections():
             print('(%s , %s)'  % (v.get_id(), w.get_id()))
 
-def DFS(imagem, pasta, graph, n):
+def DFS(imagem, pasta, graph, n, showSteps):
     node = graph.get_vertex(n)
     i = 0;
     visited = set()
@@ -185,7 +185,7 @@ def DFS(imagem, pasta, graph, n):
 
     start = time.time()
 
-    DFSUtil(imagem, pasta, node, visited, i, copy)
+    DFSUtil(imagem, pasta, node, visited, i, copy, showSteps)
     
     print("\nExecutado em {} segundos".format(time.time() - start))
 
@@ -216,7 +216,7 @@ def DFSUtil(imagem, pasta, node, visited, i, copy):
     print(i)
     cv.imwrite(pasta + 'dfs-' + str(i) + '.jpg', copy)
     qcores[j] = qcores[j]+1
-    #showImg(copy)
+    if(stepbystep): showImg(copy)
 
     for neighbour in node.adjacent:
         if neighbour not in visited:
@@ -295,7 +295,16 @@ def main():
     g = addEdges(g)
     
     print("\n")
-    #print(BFS(imagem, pasta, g,'PR', 1, 0))
-    print(DFS(imagem, pasta, g,'PR'))
+    
+    algoritmo = int(input('Qual algoritmo usar? BFS(1), DFS(2): '))
+    estado = input('Por qual estado começar? ')
+    
+    showSteps = 0
+
+    if(algoritmo == 1):
+        BFS(imagem, pasta, g, estado, 1, showSteps)
+    elif(algoritmo == 2):
+        DFS(imagem, pasta, g, estado, showSteps)
+
 
 main()
